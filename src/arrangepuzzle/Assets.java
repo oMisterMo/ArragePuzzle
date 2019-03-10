@@ -21,14 +21,13 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 /**
- *
+ * Holds all assets used in ArrangePuzzle.
  *
  * @version 0.1.0
  * @author Mohammed Ibrahim
  */
 public class Assets {
 
-    //Mario liker payer sheet
     public static BufferedImage numbers;
 
     public static BufferedImage gameImage;
@@ -37,11 +36,9 @@ public class Assets {
     public static BufferedImage roundGrass;
     public static BufferedImage random;
 
-    //Background
-//    public static BufferedImage cloud;
     public Assets() {
         //Loading all tiles
-        System.out.println("Loading tiles...");
+        System.out.println("Loading assets...");
         loadImages();
     }
 
@@ -53,10 +50,9 @@ public class Assets {
             mo = ImageIO.read(getClass().getResource("/assets/mo.jpg"));
             roundGrass = ImageIO.read(getClass().getResource("/assets/roundGrass.jpg"));
             random = ImageIO.read(getClass().getResource("/assets/img1.jpg"));
-//            cloud = ImageIO.read(getClass().getResource("/assets/cloud1.png"));
 
         } catch (IOException e) {
-            System.out.println("Error loading assets (images)...");
+            System.out.println("Error loading assets...");
         }
     }
 }
