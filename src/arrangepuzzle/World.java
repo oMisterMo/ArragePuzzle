@@ -1,30 +1,36 @@
+/* 
+ * Copyright (C) 2019 Mohammed Ibrahim
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package arrangepuzzle;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 
-import common.Vector2D;
 import common.Helper;
 
 /**
- * 16/05/2016
- *
- * @author Mo
+ * @version 0.1.0
+ * @author Mohammed Ibrahim
  */
-public class World implements GameObject {
+public class World extends GameObject {
 //    public static final int NO_OF_TILES_X
 //            = (GamePanel.GAME_WIDTH / Tile.TILE_WIDTH);       //20
 //    public static final int NO_OF_TILES_Y
@@ -41,18 +47,13 @@ public class World implements GameObject {
 
     //Array holding all tiles
     private Tile[][] tiles;
+    private Point blankPoint;
     //level to load
-    private Random r = new Random();
+    private Random r;
 
-    private Stroke stroke;
     //Moves the world (x, y) units
     public static int xShift = 0;
     public static int yShift = 0;
-
-    //Hash map storing key(tile id),
-    private Map<Integer, Point> orderedTiles;
-    private Map<Integer, Point> allTiles;
-    private Point blankPoint;
 
     //Time gone by from start of application
     float elapsed = 0;
@@ -62,7 +63,6 @@ public class World implements GameObject {
         tiles = new Tile[NO_OF_TILES_Y][NO_OF_TILES_X];
         System.out.println("No x tiles: " + NO_OF_TILES_X);
         System.out.println("No y tiles: " + NO_OF_TILES_Y);
-//        tiles = new Tile[NO_OF_TILES_X][NO_OF_TILES_Y];
 
         //Initialise each Tile to empty
 //        int type = Tile.TILE_DIGIT;     //type of tiles to load
@@ -71,12 +71,14 @@ public class World implements GameObject {
         initTiles(type);     //create empty tiles and sets default position
         setTile(type);       //sets the tile type and tile id
 
-        //Set up map info (to check if a level is completed)
-        orderedTiles = new TreeMap<>();
-        allTiles = new HashMap<>();
-
         loadLevel();    //randomise level
-//        stroke = new BasicStroke(3);
+
+        //Set the shift amount
+        xShift = GamePanel.GAME_WIDTH / 2 - (NO_OF_TILES_X * Tile.TILE_WIDTH) / 2;
+        yShift = GamePanel.GAME_HEIGHT / 2 - (NO_OF_TILES_Y * Tile.TILE_HEIGHT) / 2;
+        System.out.println("xShift: " + xShift);
+        System.out.println("yShift: " + yShift);
+        r = new Random();
     }
 
     /**
@@ -157,7 +159,7 @@ public class World implements GameObject {
 //                BufferedImage.TYPE_INT_ARGB, BOARD_WIDTH, BOARD_HEIGHT,
 //                0.5, 0.5);
         //attemp 2
-        scaledImage = Helper.resizeImg(unscaled, 320, 320);
+        scaledImage = Helper.ResizeImg(unscaled, 320, 320);
         return scaledImage;
     }
 
@@ -197,9 +199,6 @@ public class World implements GameObject {
      * Randomises the board
      */
     public void loadLevel() {
-        xShift = GamePanel.GAME_WIDTH / 2 - (NO_OF_TILES_X * Tile.TILE_WIDTH) / 2;
-        yShift = GamePanel.GAME_HEIGHT / 2 - (NO_OF_TILES_Y * Tile.TILE_HEIGHT) / 2;
-
 //        randomise();
     }
 
@@ -230,10 +229,6 @@ public class World implements GameObject {
             }
             n++;
         }
-    }
-
-    private void movePiece() {
-
     }
 
     private Tile getUpTile(Point p) {
@@ -330,37 +325,6 @@ public class World implements GameObject {
      */
     public Tile getTile(int y, int x) {
         return tiles[y][x];
-    }
-
-//    private void swap(Tile t1, Tile t2) {
-//        System.out.println("swapping...");
-//        Tile temp = t1; //save t1
-//        t1 = t2;        //set t1 = t2
-//        t2 = temp;      //set t2 = t1
-//    }
-    private void swap(Point p1, Point p2) {
-//        System.out.println("swapping...");
-//        Tile temp = tiles[p1.x][p1.y]; //save t1
-//        Point tempPoint = p1;   System.out.println("p1: "+p1);
-        Tile temp = tiles[p1.y][p1.x]; //save t1    //8,8
-        System.out.println("*********************************");
-        System.out.println(p1.x + ", " + p1.y + ": " + temp.tileType);
-        System.out.println(p1.x + ", " + p1.y + ": " + temp.tileNum);
-        Tile temp2 = tiles[p2.y][p2.x]; //save t1   //8, 7
-        System.out.println(p2.x + ", " + p2.y + ": " + temp2.tileType);
-        System.out.println(p2.x + ", " + p2.y + ": " + temp2.tileNum);
-        System.out.println("*********************************");
-
-        //p1 = P(8,8)   p2 = P(8,7)
-        tiles[p1.y][p1.x] = tiles[p2.y][p2.x];        //set t1 = t2
-//        tiles[p2.y][p2.x] = tiles[tempPoint.y][tempPoint.x];      //set t2 = t1
-        tiles[p2.y][p2.x] = temp;
-
-//        System.out.println("5, 5: "+tiles[5][5].tileNum);
-//        Tile temp3 = tiles[8][8]; //save t1
-//        System.out.println("*********************************");
-//        System.out.println("8, 8: " + temp3.tileType);
-//        System.out.println("8, 8: " + temp3.tileNum);
     }
 
     /* ************ CONTROLLER METHODs, CALLED FROM A PLAYER ************* */
@@ -500,27 +464,15 @@ public class World implements GameObject {
             System.out.println("blank type: " + tiles[blankPoint.y][blankPoint.x].tileType);
         }
     }
-    
-    public void mousePressed(MouseEvent e){
+
+    public void mousePressed(MouseEvent e) {
         System.out.println("Pressed");
-        for (int y = 0; y < NO_OF_TILES_Y; y++) {
-            for (int x = 0; x < NO_OF_TILES_X; x++) {
-                //Go through all tiles
-                
-                //DO SHIFING FIRST, THEN DRAW TO THE CENTER
-                int touchX = e.getX() + World.xShift;
-                int touchY = e.getY() + World.yShift;
-                
-                if(tiles[y][x].hitbox.contains(touchX, touchY)){
-                    System.out.println("YES");
-                }else{
-                    System.out.println("NO");
-                }
-            }
-        }
+        //DO SHIFING FIRST, THEN DRAW TO THE CENTER
+        int touchX = e.getX() + World.xShift;
+        int touchY = e.getY() + World.yShift;
     }
-    
-    public void mouseReleased(MouseEvent e){
+
+    public void mouseReleased(MouseEvent e) {
         System.out.println("Released");
     }
 
@@ -572,7 +524,8 @@ public class World implements GameObject {
                     g.fillRect(t.x + size / 2 + xShift, t.y + size / 2 + yShift,
                             t.width - size, t.height - size);
 
-                    g.drawImage(t.img, t.x + size / 2 + xShift, t.y + size / 2 + yShift, t.width, t.height, null);
+//                    g.drawImage(t.img, t.x + size / 2 + xShift, t.y + size / 2 + yShift, t.width, t.height, null);
+                    g.drawImage(t.img, t.x + size / 2 + xShift, t.y + size / 2 + yShift, null);
                 }
             }
         }

@@ -1,17 +1,29 @@
+/* 
+ * Copyright (C) 2019 Mohammed Ibrahim
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package arrangepuzzle;
 
-import common.Vector2D;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 
 /**
- * 06-Jun-2017, 20:18:03.
- *
- * @author Mo
+ * @version 0.1.0
+ * @author Mohammed Ibrahim
  */
-public class Tile implements GameObject {
+public class Tile extends GameObject {
 
     //Fixed size or shall I make it dynamic?
     public static int TILE_WIDTH = World.BOARD_WIDTH / World.NO_OF_TILES_X;
@@ -29,58 +41,13 @@ public class Tile implements GameObject {
     //Tile position and size
     public int x, y, width, height;
 
-    //Tile hitbox
-    public Rectangle hitbox;
-
     public Tile(int x, int y, int width, int height, int id) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
 
-        this.hitbox = new Rectangle(x, y, width, height);
-
         this.tileType = id;
-        loadImage();
-    }
-
-    /**
-     * Depending on the id given, load the correct image
-     *
-     * @param path image path
-     */
-    private void loadImage() {
-//        drawText("8", 0, 0);
-    }
-
-    private void drawText(String line, int x, int y) {
-//        if(line is not a number){
-//
-//            return;
-//        }
-        int len = line.length();
-        for (int i = 0; i < len; i++) {
-            char character = line.charAt(i);
-            if (character == ' ') {
-                x += 20;
-                continue;
-            }
-            int srcX;
-            int srcWidth;
-            if (character == '.') {
-                srcX = 200;
-                srcWidth = 10;
-            } else {
-                srcX = (character - '0') * 20;
-                srcWidth = 20;
-            }
-
-            BufferedImage num;
-            num = Assets.numbers.getSubimage(srcX, 0, srcWidth, 32);
-//            tileImg = num;
-
-            x += srcWidth;
-        }
     }
 
     @Override

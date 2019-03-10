@@ -14,33 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package arrangepuzzle;
-
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
+package common;
 
 /**
+ * The Circle class specifies the 2d coordinates used to represent the center
+ * of the circle and a radius.
+ *
  * @version 0.1.0
  * @author Mohammed Ibrahim
  */
-public class ImgTile extends Tile {
+public class Circle {
 
-    protected BufferedImage img;
+    public final Vector2D center = new Vector2D();
+    public float radius;
 
-    public ImgTile(int x, int y, int width, int height, int id, BufferedImage img) {
-        super(x, y, width, height, id);
-        this.img = img;
+    public Circle(float x, float y, float radius) {
+        this.center.set(x, y);
+        this.radius = radius;
     }
-
-    @Override
-    public void gameUpdate(float deltaTime) {
-        super.gameUpdate(deltaTime);    //Does nothing
-    }
-
-    @Override
-    public void gameRender(Graphics2D g) {
-        super.gameRender(g);            //Draws tile border
-//        g.drawImage(img, x + World.xShift, y + World.yShift, null);
-    }
-
 }

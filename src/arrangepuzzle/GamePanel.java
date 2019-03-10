@@ -1,26 +1,36 @@
+/* 
+ * Copyright (C) 2019 Mohammed Ibrahim
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package arrangepuzzle;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.Rectangle;
 import javax.swing.JPanel;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import common.Vector2D;
-import java.util.List;
 
 /**
- * When you remove you have to set the variable to null -> AVOID MEMORY LEAKS
  *
- * 06-Sep-2016, 23:03:23.
- *
- * @author Mo
+ * @version 0.1.0
+ * @author Mohammed Ibrahim
  */
 public class GamePanel extends JPanel implements Runnable {
 
@@ -41,15 +51,13 @@ public class GamePanel extends JPanel implements Runnable {
 
     //GAME VARIABLES HERE-------------------------------------------------------
     private Color backgroundColor;    //Represents colour of background
-    
-    private World world;
-    private Player player;
 
+    private World world;
 
     //CONSTRUCTOR
     public GamePanel() {
         super();
-        setPreferredSize(new Dimension(GAME_WIDTH - 10, GAME_HEIGHT - 10));
+        setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
         setFocusable(true);
         //System.out.println(requestFocusInWindow());
         requestFocus(); //-> platform dependant
@@ -60,17 +68,11 @@ public class GamePanel extends JPanel implements Runnable {
 
     private void init() {
 //        assets = new Assets();
-        Assets.loadImages();
+//        Assets.loadImages();
         world = new World();
-//        player = new Player(0,
-//                0,
-//                32,
-//                32,
-//                Tile.TILE_EMPTY,
-//                world);
         //-----------------------------END my random test
 //        backgroundColor = new Color(0, 0, 0);    //Represents colour of background
-        backgroundColor = new Color(135,206,235);    //Represents colour of background
+        backgroundColor = new Color(135, 206, 235);    //Represents colour of background
 
         //Load listeners
         input = new Input();
@@ -153,9 +155,8 @@ public class GamePanel extends JPanel implements Runnable {
 
     private void handleInput() {
         if (Input.isKeyPressed(KeyEvent.VK_N)) {
-            
+
         }
-//        player.handleInput();
         world.handleInput();
     }
 
@@ -164,10 +165,8 @@ public class GamePanel extends JPanel implements Runnable {
         deltaTime *= scaleTime; //Objects that are slow mo after this line
 
         world.gameUpdate(deltaTime);
-//        player.gameUpdate(deltaTime);
 //        updateRandomThings();
     }
-
 
     /**
      * ******************** UPDATE & RENDER *************************
@@ -178,10 +177,8 @@ public class GamePanel extends JPanel implements Runnable {
         g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
         //********** Do drawings HERE **********
-
 //        drawRandomThings();
         world.gameRender(g);
-//        player.gameRender(g);
     }
 
     private void gameDraw() {
