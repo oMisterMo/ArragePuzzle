@@ -28,13 +28,13 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 /**
+ * Game screen which ties together all classes.
  *
  * @version 0.1.0
  * @author Mohammed Ibrahim
  */
 public class GamePanel extends JPanel implements Runnable {
 
-    //GAMES WIDTH & HEIGHT
     public static final int GAME_WIDTH = 640;
     public static final int GAME_HEIGHT = 360;
 
@@ -49,12 +49,13 @@ public class GamePanel extends JPanel implements Runnable {
     private long averageFPS;
     private float scaleTime = 1;
 
-    //GAME VARIABLES HERE-------------------------------------------------------
-    private Color backgroundColor;    //Represents colour of background
+    private Color backgroundColor;
 
     private World world;
 
-    //CONSTRUCTOR
+    /**
+     * Default constructor, creates a new World
+     */
     public GamePanel() {
         super();
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
@@ -62,17 +63,12 @@ public class GamePanel extends JPanel implements Runnable {
         //System.out.println(requestFocusInWindow());
         requestFocus(); //-> platform dependant
 
-        //initialise varialbes
         init();
     }
 
     private void init() {
-//        assets = new Assets();
-//        Assets.loadImages();
         world = new World();
-        //-----------------------------END my random test
-//        backgroundColor = new Color(0, 0, 0);    //Represents colour of background
-        backgroundColor = new Color(135, 206, 235);    //Represents colour of background
+        backgroundColor = new Color(135, 206, 235);
 
         //Load listeners
         input = new Input();
@@ -81,10 +77,6 @@ public class GamePanel extends JPanel implements Runnable {
         addMouseListener(new MAdapter());
     }
 
-    //METHODS
-    /*
-     Is called after our JPanel has been added to the JFrame component.
-     */
     @Override
     public void addNotify() {
         super.addNotify();
@@ -96,88 +88,81 @@ public class GamePanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        long startTime;
+        long startTime = System.nanoTime();
+        float deltaTime;
         long timeTaken;
         long frameCount = 0;
         long totalTime = 0;
         long waitTime;
         long targetTime = 1000 / FPS;
-        int counter = 0;    //can delete, counts negative waitTime
 
         running = true;
-
         image = new BufferedImage(GAME_WIDTH, GAME_HEIGHT, BufferedImage.TYPE_INT_RGB);
         g = (Graphics2D) image.getGraphics();
 
         //GAME LOOP
         while (running) {
+            //Calculate time since last frame
+            deltaTime = (System.nanoTime() - startTime) / 1_000_000_000.0f; //ns -> sec
             startTime = System.nanoTime();
 
+            //Handle input, update and render
             handleInput();
-            gameUpdate(1f / FPS);
+            gameUpdate(deltaTime);
             Input.updateLastKey();
             gameRender(g);
             gameDraw();
 
             //How long it took to run
-            timeTaken = (System.nanoTime() - startTime) / 1000000;
-            //              16ms - targetTime
+            timeTaken = (System.nanoTime() - startTime) / 1_000_000;    //ns -> milli
+            //16ms - timeTaken
             waitTime = targetTime - timeTaken;
-
-            //System.out.println(timeTaken);
-            if (waitTime < 0) {
-                //I get a negative value at the beg
-//                System.out.println(counter++ + " - NEGATIVE: " + waitTime);
-//                System.out.println("targetTime = " + targetTime);
-//                System.out.println("timeTaken = " + timeTaken + "\n");
-            }
-
             try {
                 //System.out.println("Sleeping for: " + waitTime);
-                //thread.sleep(waitTime);
-                Thread.sleep(waitTime);
-            } catch (Exception ex) {
+                thread.sleep(waitTime);
+            } catch (Exception e) {
 
             }
             totalTime += System.nanoTime() - startTime;
             frameCount++;
 
-            //If the current frame == 60  we calculate the average frame count
+            /*Debug*/
+            //Calculate average fps
             if (frameCount >= FPS) {
-                averageFPS = 1000 / ((totalTime / frameCount) / 1000000);
+                averageFPS = 1000 / ((totalTime / frameCount) / 1000_000);
                 frameCount = 0;
                 totalTime = 0;
                 //System.out.println("Average fps: " + averageFPS);
             }
+            //Print negative wait time
+            if (waitTime < 0) {
+                //I get a negative value at the beg
+                System.out.println("NEGATIVE: " + waitTime);
+                System.out.println("targetTime = " + targetTime);
+                System.out.println("timeTaken = " + timeTaken + "\n");
+            }
         }
-
     }
 
     private void handleInput() {
         if (Input.isKeyPressed(KeyEvent.VK_N)) {
-
+            //do nothing
         }
         world.handleInput();
     }
 
     private void gameUpdate(float deltaTime) {
-        //********** Do updates HERE **********
-        deltaTime *= scaleTime; //Objects that are slow mo after this line
+        deltaTime *= scaleTime;
 
         world.gameUpdate(deltaTime);
-//        updateRandomThings();
     }
 
-    /**
-     * ******************** UPDATE & RENDER *************************
-     */
+    /* ********************* UPDATE & RENDER ************************* */
     private void gameRender(Graphics2D g) {
         //Clear screen
         g.setColor(backgroundColor);
         g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-        //********** Do drawings HERE **********
-//        drawRandomThings();
         world.gameRender(g);
     }
 
@@ -187,25 +172,15 @@ public class GamePanel extends JPanel implements Runnable {
         g2.dispose();
     }
 
-    /**
-     * *************** EVENT HANDERLERS ***********************
-     */
-    //Handle Input ** Inner Class
+    /* *************** EVENT HANDERLERS *********************** */
     private class TAdapter extends KeyAdapter {
 
-        //When a key is pressed, let the CRAFT class deal with it.
         @Override
         public void keyPressed(KeyEvent e) {
-            //Handle player from world movement
-//            player.keyPressed(e);
-
-//            world.keyPressed(e);
         }
 
         @Override
         public void keyReleased(KeyEvent e) {
-            //ship.keyReleased(e);
-//            player.keyReleased(e);
         }
     }
 
@@ -214,7 +189,6 @@ public class GamePanel extends JPanel implements Runnable {
         @Override
         public void mouseClicked(MouseEvent e) {
             //System.out.println("CLICKED");
-            //Clicked and released
         }
 
         @Override
@@ -240,10 +214,4 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
     }
-
-    //Getters and Setters
-    public Color getColor() {
-        return backgroundColor;
-    }
-
 }

@@ -27,28 +27,23 @@ import java.util.Random;
 import common.Helper;
 
 /**
+ * The World class ties together all classes to simulate the sliding puzzle
+ * game.
+ *
  * @version 0.1.0
  * @author Mohammed Ibrahim
  */
 public class World extends GameObject {
-//    public static final int NO_OF_TILES_X
-//            = (GamePanel.GAME_WIDTH / Tile.TILE_WIDTH);       //20
-//    public static final int NO_OF_TILES_Y
-//            = (int) Math.round(GamePanel.GAME_HEIGHT / Tile.TILE_HEIGHT);     //12
-//    public static final int NO_OF_TILES_Y = (GamePanel.GAME_HEIGHT / Tile.TILE_HEIGHT);     //12
 
     public static final int BOARD_WIDTH = 320;
     public static final int BOARD_HEIGHT = 320;
-
     public static final int NO_OF_TILES_X = 3;
     public static final int NO_OF_TILES_Y = 3;
-
     public static final int NO_OF_LEVELS = 1;
 
     //Array holding all tiles
     private Tile[][] tiles;
     private Point blankPoint;
-    //level to load
     private Random r;
 
     //Moves the world (x, y) units
@@ -58,33 +53,32 @@ public class World extends GameObject {
     //Time gone by from start of application
     float elapsed = 0;
 
+    /**
+     * Initialise and create a new 3x3 world on a 320 x 320 pixel board.
+     */
     public World() {
-        //Initial new world here
         tiles = new Tile[NO_OF_TILES_Y][NO_OF_TILES_X];
         System.out.println("No x tiles: " + NO_OF_TILES_X);
         System.out.println("No y tiles: " + NO_OF_TILES_Y);
 
-        //Initialise each Tile to empty
-//        int type = Tile.TILE_DIGIT;     //type of tiles to load
-        int type = Tile.TILE_IMAGE;     //type of tiles to load
-        clearBoard();   //sets to null
+//        int type = Tile.TILE_DIGIT;       //type of tiles to load
+        int type = Tile.TILE_IMAGE;         //type of tiles to load
+        nullTiles();   //sets to null
         initTiles(type);     //create empty tiles and sets default position
-        setTile(type);       //sets the tile type and tile id
 
         loadLevel();    //randomise level
 
         //Set the shift amount
-        xShift = GamePanel.GAME_WIDTH / 2 - (NO_OF_TILES_X * Tile.TILE_WIDTH) / 2;
-        yShift = GamePanel.GAME_HEIGHT / 2 - (NO_OF_TILES_Y * Tile.TILE_HEIGHT) / 2;
+        xShift = GamePanel.GAME_WIDTH / 2
+                - (NO_OF_TILES_X * Tile.TILE_WIDTH) / 2;
+        yShift = GamePanel.GAME_HEIGHT / 2
+                - (NO_OF_TILES_Y * Tile.TILE_HEIGHT) / 2;
         System.out.println("xShift: " + xShift);
         System.out.println("yShift: " + yShift);
         r = new Random();
     }
 
-    /**
-     * Sets all spikeBlocks to null
-     */
-    public void clearBoard() {
+    private void nullTiles() {
         System.out.println("Setting all tiles to null...");
         for (int i = 0; i < NO_OF_TILES_Y; i++) {
             for (int j = 0; j < NO_OF_TILES_X; j++) {
@@ -93,9 +87,6 @@ public class World extends GameObject {
         }
     }
 
-    /**
-     * Called from the constructor, sets the position of all tiles
-     */
     private void initTiles(int tileType) {
         System.out.println("Initilising tiles....");
         Tile.TILE_WIDTH = BOARD_WIDTH / NO_OF_TILES_X;
@@ -114,40 +105,41 @@ public class World extends GameObject {
     }
 
     private void initNumTiles() {
+        int id = 1;
         for (int y = 0; y < NO_OF_TILES_Y; y++) {
             for (int x = 0; x < NO_OF_TILES_X; x++) {
                 tiles[y][x] = new Tile(x * Tile.TILE_WIDTH, y * Tile.TILE_HEIGHT,
                         Tile.TILE_WIDTH, Tile.TILE_HEIGHT,
-                        Tile.TILE_EMPTY);
+                        Tile.TILE_DIGIT, id);
+                id++;
             }
         }
+        //Set last tile to empty
         blankPoint = new Point(NO_OF_TILES_X - 1, NO_OF_TILES_Y - 1);
+        tiles[blankPoint.y][blankPoint.x].tileType = Tile.TILE_EMPTY;
         System.out.println("blank var: " + blankPoint);
     }
 
-    /**
-     * Split up large image into smaller tiles and set
-     */
     private void initImageTiles() {
         //Scale image to 320 x 320
         BufferedImage scaledImage = reSizeImage(Assets.iroh);
         //Set smaller tiles
+        int id = 1;
         for (int y = 0; y < NO_OF_TILES_Y; y++) {
             for (int x = 0; x < NO_OF_TILES_X; x++) {
                 //Split up image
-//                BufferedImage img = Assets.gameImage
-//                BufferedImage img = Assets.mo
-//                BufferedImage img = Assets.random
                 BufferedImage tile = scaledImage
-                        //                                                .getSubimage(x*Tile.TILE_WIDTH, y*Tile.TILE_HEIGHT, 
                         .getSubimage(x * Tile.TILE_WIDTH, y * Tile.TILE_HEIGHT,
                                 Tile.TILE_WIDTH, Tile.TILE_HEIGHT);
                 tiles[y][x] = new ImgTile(x * Tile.TILE_WIDTH, y * Tile.TILE_HEIGHT,
                         Tile.TILE_WIDTH, Tile.TILE_HEIGHT,
-                        Tile.TILE_EMPTY, tile);
+                        Tile.TILE_IMAGE, id, tile);
+                id++;
             }
         }
+        //Set last tile to empty
         blankPoint = new Point(NO_OF_TILES_X - 1, NO_OF_TILES_Y - 1);
+        tiles[blankPoint.y][blankPoint.x].tileType = Tile.TILE_EMPTY;
         System.out.println("blank var: " + blankPoint);
     }
 
@@ -163,45 +155,23 @@ public class World extends GameObject {
         return scaledImage;
     }
 
-    /**
-     * Tiles are ordered 1 - number of tiles and set to numbered tile
-     *
-     * @param tileType type of tile
-     */
-    public void setTile(int tileType) {
-        System.out.println("Setting the id and tile type of each tile...");
-
-        int num = 1;
-        for (int y = 0; y < NO_OF_TILES_Y; y++) {
-            for (int x = 0; x < NO_OF_TILES_X; x++) {
-                //Set all tiles to number
-                if (tileType == Tile.TILE_DIGIT) {
-                    tiles[y][x].tileType = Tile.TILE_DIGIT;
-                } else if (tileType == Tile.TILE_IMAGE) {
-                    tiles[y][x].tileType = Tile.TILE_IMAGE;
-                }
-
-                //Default position = arrange board inorder 1-n
-                tiles[y][x].tileNum = num;
-                num++;
-            }
-        }
-        //Set last tile to empty
-        tiles[blankPoint.y][blankPoint.x].tileType = Tile.TILE_EMPTY;
-        tiles[blankPoint.y][blankPoint.x].tileNum = -1;
-    }
-
     private void resetBoard() {
         System.out.println("Setting all tiles to default position...");
     }
 
     /**
-     * Randomises the board
+     * Randomises the board.
      */
     public void loadLevel() {
 //        randomise();
     }
 
+    /**
+     * Incomplete. While n less than 100, pick a random direction (up, down,
+     * left, right) and moves the empty tile.
+     *
+     * @param deltaTime time gone by
+     */
     private void randomise(float deltaTime) {
         System.out.println("SHUFFLE");
         int n = 0;
@@ -296,18 +266,17 @@ public class World extends GameObject {
         return new Point(p.x + 1, p.y);
     }
 
-    /**
-     * x >= 0, x < 8
-     *
-     * @param p
-     * @return
-     */
-    public boolean withinBounds(Point p) {
-        return p.x >= 0 && p.x < NO_OF_TILES_X && p.y >= 0 & p.y < NO_OF_TILES_Y;
+    private boolean withinBounds(int x, int y) {
+        return x >= 0 && y >= 0
+                && x < NO_OF_TILES_X && y < NO_OF_TILES_Y;
+    }
+
+    private boolean withinBounds(Point p) {
+        return withinBounds(p.x, p.y);
     }
 
     /*  Getters & Setters */
-    public void setTileId(int x, int y, int id) {
+    private void setTileId(int x, int y, int id) {
         if (id < 0 || id > Tile.TILE_IMAGE) {
             System.out.println("Error! Must be within valid tile range 0 - 2");
             return;
@@ -315,20 +284,15 @@ public class World extends GameObject {
         tiles[y][x].tileType = id;
     }
 
-    /**
-     * Gets the actual spikeBlock (if another class needs to access a
-     * spikeBlock)
-     *
-     * @param y position
-     * @param x position
-     * @return tile at x, y
-     */
-    public Tile getTile(int y, int x) {
+    private Tile getTile(int x, int y) {
+        if (!withinBounds(x, y)) {
+            return null;
+        }
+        //to do : optimize this method and use it instead of the other four
         return tiles[y][x];
     }
 
-    /* ************ CONTROLLER METHODs, CALLED FROM A PLAYER ************* */
-    public void moveUp() {
+    private void moveUp() {
 //        System.out.println("MOVE UP");
         //Get blank and above tiles
         Tile blankTile = tiles[blankPoint.y][blankPoint.x];
@@ -337,43 +301,18 @@ public class World extends GameObject {
         Point abovePoint = getUp(blankPoint);
 
         if (withinBounds(abovePoint)) {
-//            System.out.println("YES");
             //Swap tiles positions
-            tiles[blankPoint.y][blankPoint.x].y -= Tile.TILE_HEIGHT;      //blank tile go up
-            tiles[abovePoint.y][abovePoint.x].y += Tile.TILE_HEIGHT;    //tile above blank go down
+            tiles[blankPoint.y][blankPoint.x].y -= Tile.TILE_HEIGHT;    //blank tile goes up
+            tiles[abovePoint.y][abovePoint.x].y += Tile.TILE_HEIGHT;    //tile above blank goes down
             //Swap tiles 
             tiles[blankPoint.y][blankPoint.x] = aboveTile;
             tiles[abovePoint.y][abovePoint.x] = blankTile;
             //Update blank point
             blankPoint.y -= 1;
-        } else {
-//            System.out.println("NO");
         }
-
-//        
-//        //update blank position
-//        blank = new Point(blank.x, blank.y - 1);
-//        System.out.println("tile num: "+tiles[blank.y][blank.x].tileNum);
-//        Point p = blank;
-//        System.out.println("old blank: "+blank);
-//        //If tile is on bottom row return
-//        if (p.y == 0) {
-//            //Do nothing
-//            System.out.println("can't move DOWN...");
-//        } else {
-//            //else move up
-//            swap(blank, getUp(p));
-//            blank = new Point(blank.x, blank.y - 1);
-//            tiles[blank.y][blank.x].tileType = Tile.TILE_EMPTY;
-//            tiles[blank.y][blank.x].tileNum = tiles[p.y][p.x].tileNum;
-//            System.out.println(tiles[blank.y][blank.x].tileType);
-//            System.out.println("new blank: "+blank);
-//        }
-        //refresh board
-//        setTile();
     }
 
-    public void moveDown() {
+    private void moveDown() {
 //        System.out.println("MOVE DOWN");
         //Get blank and below tiles
         Tile blankTile = tiles[blankPoint.y][blankPoint.x];
@@ -382,7 +321,6 @@ public class World extends GameObject {
         Point belowPoint = getDown(blankPoint);
 
         if (withinBounds(belowPoint)) {
-//            System.out.println("YES");
             //Swap tiles positions
             tiles[blankPoint.y][blankPoint.x].y += Tile.TILE_HEIGHT;
             tiles[belowPoint.y][belowPoint.x].y -= Tile.TILE_HEIGHT;
@@ -391,12 +329,10 @@ public class World extends GameObject {
             tiles[belowPoint.y][belowPoint.x] = blankTile;
             //Update blank point
             blankPoint.y += 1;
-        } else {
-//            System.out.println("NO");
         }
     }
 
-    public void moveLeft() {
+    private void moveLeft() {
 //        System.out.println("MOVE LEFT");
         //Get blank and left tiles
         Tile blankTile = tiles[blankPoint.y][blankPoint.x];
@@ -405,7 +341,6 @@ public class World extends GameObject {
         Point leftPoint = getLeft(blankPoint);
 
         if (withinBounds(leftPoint)) {
-//            System.out.println("YES");
             //Swap tiles positions
             tiles[blankPoint.y][blankPoint.x].x -= Tile.TILE_WIDTH;
             tiles[leftPoint.y][leftPoint.x].x += Tile.TILE_WIDTH;
@@ -414,12 +349,10 @@ public class World extends GameObject {
             tiles[leftPoint.y][leftPoint.x] = blankTile;
             //Update blank point
             blankPoint.x -= 1;
-        } else {
-//            System.out.println("NO");
         }
     }
 
-    public void moveRight() {
+    private void moveRight() {
 //        System.out.println("MOVE RIGHT");
         //Get blank and right tiles
         Tile blankTile = tiles[blankPoint.y][blankPoint.x];
@@ -428,7 +361,6 @@ public class World extends GameObject {
         Point rightPoint = getRight(blankPoint);
 
         if (withinBounds(rightPoint)) {
-//            System.out.println("YES");
             //Swap tiles positions
             tiles[blankPoint.y][blankPoint.x].x += Tile.TILE_WIDTH;
             tiles[rightPoint.y][rightPoint.x].x -= Tile.TILE_WIDTH;
@@ -437,25 +369,31 @@ public class World extends GameObject {
             tiles[rightPoint.y][rightPoint.x] = blankTile;
             //Update blank point
             blankPoint.x += 1;
-        } else {
-//            System.out.println("NO");
         }
     }
 
+    /**
+     * All input is handled by the World class.
+     */
     public void handleInput() {
-        if (Input.isKeyTyped(KeyEvent.VK_W)) {
-            moveUp();
-        }
-        if (Input.isKeyTyped(KeyEvent.VK_S)) {
+        if (Input.isKeyTyped(KeyEvent.VK_W) || Input.isKeyTyped(KeyEvent.VK_I)
+                || Input.isKeyTyped(KeyEvent.VK_UP)) {
             moveDown();
         }
-        if (Input.isKeyTyped(KeyEvent.VK_A)) {
-            moveLeft();
+        if (Input.isKeyTyped(KeyEvent.VK_S) || Input.isKeyTyped(KeyEvent.VK_K)
+                || Input.isKeyTyped(KeyEvent.VK_DOWN)) {
+            moveUp();
         }
-        if (Input.isKeyTyped(KeyEvent.VK_D)) {
+        if (Input.isKeyTyped(KeyEvent.VK_A) || Input.isKeyTyped(KeyEvent.VK_J)
+                || Input.isKeyTyped(KeyEvent.VK_LEFT)) {
             moveRight();
         }
+        if (Input.isKeyTyped(KeyEvent.VK_D) || Input.isKeyTyped(KeyEvent.VK_L)
+                || Input.isKeyTyped(KeyEvent.VK_RIGHT)) {
+            moveLeft();
+        }
         if (Input.isKeyTyped(KeyEvent.VK_B)) {
+            //Print debug info to console 
             System.out.println("***blank information***");
             System.out.println("tiles[blankPoint.y][blankPoint.x]: " + tiles[blankPoint.y][blankPoint.x]);
             System.out.println("blank x: " + tiles[blankPoint.y][blankPoint.x].x);
@@ -465,24 +403,32 @@ public class World extends GameObject {
         }
     }
 
+    /**
+     * Handles left/right and middle click.
+     *
+     * @param e mouse event
+     */
     public void mousePressed(MouseEvent e) {
         System.out.println("Pressed");
         //DO SHIFING FIRST, THEN DRAW TO THE CENTER
         int touchX = e.getX() + World.xShift;
         int touchY = e.getY() + World.yShift;
+
+        //1.Get the touch position
+        //2.Check if its within a tiles bounding box
+        //3.Move appropriate tile
     }
 
+    /**
+     * Handles the release of a mouse button.
+     *
+     * @param e mouse event
+     */
     public void mouseReleased(MouseEvent e) {
         System.out.println("Released");
     }
 
-    /**
-     * *************** UPDATE & RENDER *******************
-     */
-    /**
-     *
-     * @param deltaTime
-     */
+    /* ********************* UPDATE & RENDER ************************* */
     @Override
     public void gameUpdate(float deltaTime) {
         //If im moving any of the world tiles
@@ -490,20 +436,16 @@ public class World extends GameObject {
 //        System.out.println("elapsed: " + elapsed);
     }
 
-    /**
-     * @param g
-     */
     @Override
     public void gameRender(Graphics2D g) {
         /* Called every frame */
-        drawHitbox(g);
+        drawTiles(g);
     }
 
-    private void drawHitbox(Graphics2D g) {
-        //NAIVE, renders all tiles (including off screen tiles)
+    private void drawTiles(Graphics2D g) {
         for (int y = 0; y < NO_OF_TILES_Y; y++) {
             for (int x = 0; x < NO_OF_TILES_X; x++) {
-                //Draw Border
+                //Draw (ugly) Border
                 tiles[y][x].gameRender(g);
 
                 //Draw tile
@@ -516,7 +458,8 @@ public class World extends GameObject {
 
                     String tileNum = String.valueOf(tiles[y][x].tileNum);
 
-                    drawText(g, tileNum, tiles[y][x].x + xShift, tiles[y][x].y + yShift);
+                    drawText(g, tileNum, tiles[y][x].x + xShift,
+                            tiles[y][x].y + yShift);
                 } else if (tiles[y][x].tileType == Tile.TILE_IMAGE) {
                     g.setColor(Color.lightGray);    //white also works
                     ImgTile t = (ImgTile) tiles[y][x];
@@ -524,8 +467,8 @@ public class World extends GameObject {
                     g.fillRect(t.x + size / 2 + xShift, t.y + size / 2 + yShift,
                             t.width - size, t.height - size);
 
-//                    g.drawImage(t.img, t.x + size / 2 + xShift, t.y + size / 2 + yShift, t.width, t.height, null);
-                    g.drawImage(t.img, t.x + size / 2 + xShift, t.y + size / 2 + yShift, null);
+                    g.drawImage(t.img, t.x + size / 2 + xShift,
+                            t.y + size / 2 + yShift, null);
                 }
             }
         }

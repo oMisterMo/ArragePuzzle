@@ -20,16 +20,19 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 /**
+ * The Tile class represents the building blocks to the sliding puzzle game. The
+ * {@link #tileNum tileNum} field represents a unique value ranging from 1 - N
+ * where N represents the number of tiles.
+ *
  * @version 0.1.0
  * @author Mohammed Ibrahim
  */
 public class Tile extends GameObject {
 
-    //Fixed size or shall I make it dynamic?
     public static int TILE_WIDTH = World.BOARD_WIDTH / World.NO_OF_TILES_X;
     public static int TILE_HEIGHT = World.BOARD_HEIGHT / World.NO_OF_TILES_Y;
 
-    //All type of tiles
+    //Tile types
     public static final int TILE_EMPTY = 0;
     public static final int TILE_DIGIT = 1;
     public static final int TILE_IMAGE = 2;
@@ -38,16 +41,26 @@ public class Tile extends GameObject {
     //Unique value representing the position
     public int tileNum = -1;
 
-    //Tile position and size
     public int x, y, width, height;
 
-    public Tile(int x, int y, int width, int height, int id) {
+    /**
+     * Constructs a new tile at the position given. The type represents what to
+     * overlay the tile with (empty/number/image).
+     *
+     * @param x the x position
+     * @param y the y position
+     * @param width the width of the tile
+     * @param height the height of the tile
+     * @param type the tile overlay
+     */
+    public Tile(int x, int y, int width, int height, int type, int tileNum) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
 
-        this.tileType = id;
+        this.tileType = type;
+        this.tileNum = tileNum;
     }
 
     @Override

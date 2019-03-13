@@ -20,6 +20,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 /**
+ * The ImgTile class extends Tile and adds a new field {@link #img img}. The
+ * field represents the sub section of the total image.
+ *
  * @version 0.1.0
  * @author Mohammed Ibrahim
  */
@@ -27,8 +30,20 @@ public class ImgTile extends Tile {
 
     protected BufferedImage img;
 
-    public ImgTile(int x, int y, int width, int height, int id, BufferedImage img) {
-        super(x, y, width, height, id);
+    /**
+     * Constructs a new tile at the position given. The type represents what to
+     * overlay the tile with (empty/number/image).
+     *
+     * @param x the x position
+     * @param y the y position
+     * @param width the width of the tile
+     * @param height the height of the tile
+     * @param type the tile overlay
+     * @param img the sub section of image
+     */
+    public ImgTile(int x, int y, int width, int height, int type, int tileNum,
+            BufferedImage img) {
+        super(x, y, width, height, type, tileNum);
         this.img = img;
     }
 
