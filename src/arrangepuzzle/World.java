@@ -172,15 +172,15 @@ public class World extends GameObject {
      *
      * @param deltaTime time gone by
      */
-    private void randomise(float deltaTime) {
+    private void randomise() {
         System.out.println("SHUFFLE");
         int n = 0;
-        long start = System.currentTimeMillis();
-        long elapsed;
-        while (n < 100) {
+//        long start = System.currentTimeMillis();
+//        long elapsed;
+        while (n < 1000) {
             //Delay movement
-            elapsed = System.currentTimeMillis() - start;
-            System.out.println("elapsed: " + elapsed);
+//            elapsed = System.currentTimeMillis() - start;
+//            System.out.println("elapsed: " + elapsed);
             //Move
             int ran = r.nextInt(4);
             switch (ran) {
@@ -376,6 +376,10 @@ public class World extends GameObject {
      * All input is handled by the World class.
      */
     public void handleInput() {
+        if (Input.isKeyPressed(KeyEvent.VK_R)) {
+            randomise();
+            return;
+        }
         if (Input.isKeyTyped(KeyEvent.VK_W) || Input.isKeyTyped(KeyEvent.VK_I)
                 || Input.isKeyTyped(KeyEvent.VK_UP)) {
             moveDown();
